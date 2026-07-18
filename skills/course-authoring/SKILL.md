@@ -77,17 +77,18 @@ Run the validation checklist below before you persist.
 
 Once the plan is complete and validated:
 
-1. **(Optional) Pick a face and voice.** For `talking_head`, call `list_talking_head_avatars` and choose an avatar; pass its id as `talking_head_avatar_id`. Always also pass `voice_id` (an ElevenLabs voice) explicitly, so narration works even if the avatar carries no voice of its own. For `audio_only`, pass `instructor_image_url` (a still image) plus `voice_id` - there is no on-camera avatar.
+1. **Pick a face and voice (required).** `create_course_from_plan` requires **either `talking_head_avatar_id` or `instructor_id`** - in every narration mode, including `audio_only` and `none` (omitting both fails with `either instructor_id or talking_head_avatar_id is required`). Call `list_talking_head_avatars` and pass a chosen avatar's id as `talking_head_avatar_id`, or reuse a saved instructor via `instructor_id` (see `list_course_instructors`). Always also pass `voice_id` (an ElevenLabs voice) explicitly, so narration works even if the avatar carries no voice of its own. For `audio_only`, the avatar/instructor still supplies the presenter identity; you may additionally pass `instructor_image_url` (a still image) - but the avatar or instructor id is not optional.
 
-2. **Create the draft.** Call `create_course_from_plan(name, course_plan, ...)`. Beyond `name` and `course_plan`, the optional instructor/voice fields are `talking_head_avatar_id`, `voice_id`, `instructor_id`, `instructor_name`, `instructor_image_url`, `instructor_persona`, and `instructor_description` (pass an existing `instructor_id` to reuse a saved instructor, or the individual `instructor_*` fields to define one inline). At this point every `say` beat's `talking_head_clip_url` still contains the literal `__CID__` placeholder - that is correct. The call returns `{ id, status }` with `status: "draft"`.
+2. **Create the draft.** Call `create_course_from_plan(name, course_plan, ...)`. You must pass **one of** `talking_head_avatar_id` or `instructor_id`. The other instructor/voice fields are `voice_id`, `instructor_name`, `instructor_image_url`, `instructor_persona`, and `instructor_description` (pass an existing `instructor_id` to reuse a saved instructor, or an avatar id plus the individual `instructor_*` fields to mint one inline). At this point every `say` beat's `talking_head_clip_url` still contains the literal `__CID__` placeholder - that is correct. The call returns `{ id, status }` with `status: "draft"`.
 
 ```
 create_course_from_plan(
   name = "Selling Widgets 101",
   course_plan = <plan with __CID__ placeholders>,
+  talking_head_avatar_id = "tha_...",   // REQUIRED (or pass instructor_id); from list_talking_head_avatars
   voice_id = "pNInz6obpgDQGcFmaJgB",
   instructor_name = "Ada",
-  instructor_image_url = "https://.../ada.png",     // for audio_only
+  instructor_image_url = "https://.../ada.png",     // optional still image for audio_only
 )
 -> { "id": "crs_abc123", "status": "draft" }
 ```
@@ -107,7 +108,7 @@ set_course_plan(course_id = "crs_abc123", course_plan = plan2)
 
 ## Narration modes
 
-- **`audio_only`** - a still instructor image plus TTS narration. Set `instructor_image_url` + `voice_id`. Publishes instantly.
+- **`audio_only`** - a still presenter plus TTS narration. Set a `talking_head_avatar_id` (or `instructor_id`) - still required - plus `voice_id`, and optionally `instructor_image_url` for the still image. Publishes instantly.
 - **`talking_head`** - an on-camera avatar reads the narration. Set `talking_head_avatar_id` (from `list_talking_head_avatars`) + `voice_id`.
 - **`none`** - a silent, slides-only course. Author slides, quizzes, and roleplays as usual, but leave every `say` beat's `say` as `""`. The learner reads each slide and advances manually. This is the one mode that publishes with empty narration by design; every other mode requires real narration on every teaching beat before publish.
 
@@ -204,12 +205,13 @@ A tiny two-slide `audio_only` course with one quiz, from plan to published.
 
 ```
 # create the draft (placeholders still in place)
+# talking_head_avatar_id (or instructor_id) is REQUIRED, even for audio_only
 create_course_from_plan(
   name = "Selling Widgets 101",
   course_plan = <plan above>,
+  talking_head_avatar_id = "tha_64239430397e",   // from list_talking_head_avatars
   voice_id = "pNInz6obpgDQGcFmaJgB",
   instructor_name = "Ada",
-  instructor_image_url = "https://.../ada.png",
 )  ->  { "id": "crs_abc123", "status": "draft" }
 
 # swap every "__CID__" -> "crs_abc123", then re-persist the whole plan

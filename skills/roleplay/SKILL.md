@@ -42,7 +42,7 @@ No em-dashes (the `-` character run) in any generated script text: persona name,
 Before you invent a buyer, and the moment you know the buyer's role, call `list_personas()` and scan the returned `items` for one that matches (same role, or an obvious fit like "a skeptical CISO" -> a saved CISO persona). This is a mandatory create step, not an afterthought.
 
 - **A saved persona clearly matches**: call `AskUserQuestion` offering two options, "Use <Name> (<title>)" and "No, create a fresh character". Only ask when there is a genuine match; never dump the whole library.
-  - If the user picks it, pass its id in `persona_ids` on `admin_create_practice_script`, and do NOT hand-write that buyer's identity: leave `agent_details.name`, `voice_id`, and `image_url` out, and do not restate who the buyer is in the scenario/session text. The persona's identity, voice, and face are injected automatically at run time. Write the scenario about behavior only: the situation, what the buyer protects, the objections, what unlocks them, in second person ("You are skeptical of AI vendors...", "You guard the SOC 2 details until...") without an opening "You are <name>, <role>..." line.
+  - If the user picks it, pass its id in `persona_ids` on `admin_create_practice_script` and **omit `agent_details` entirely** (do not pass it at all). Do not pass a partial `agent_details` such as `{first_message: ...}` - whenever `agent_details` is present the API requires `agent_details.name`, so a partial dict fails with a 422 `agent_details.name Field required`. The persona's identity, voice, and face are injected automatically at run time. Write the scenario about behavior only: the situation, what the buyer protects, the objections, what unlocks them, in second person ("You are skeptical of AI vendors...", "You guard the SOC 2 details until...") without an opening "You are <name>, <role>..." line. If you need a specific opening line with a persona attached, either bake it into the session script or pass `agent_details` with BOTH the persona's `name` and your `first_message`.
 - **Nothing matches**: author the character inline as usual (below). After drafting a distinctive buyer you MAY offer via `AskUserQuestion` ("Save as a reusable persona" / "Keep it inline") to save it with `create_persona(...)`, then attach the returned id via `persona_ids`.
 
 Do not over-ask. If the request does not need a specific buyer, or you are editing a script that already carries personas, do not raise personas at all.
@@ -54,7 +54,7 @@ Fill in the `admin_create_practice_script` inputs:
 - **`name`** - descriptive title ("VP Engineering Cold Call - DevOps Platform").
 - **`scenario`** - a 1-2 sentence description of the situation the rep is practicing.
 - **`session_script`** - the detailed roleplay instructions (markdown) sent verbatim as the persona's system prompt. Follow the Instructions template and Role clarity rules below.
-- **`agent_details`** - the persona identity and voice behavior (see Personas). For an attached saved persona, keep this minimal (just `first_message`).
+- **`agent_details`** - the persona identity and voice behavior (see Personas). REQUIRED when you author a buyer inline: it must include at least `name`. OMIT it entirely when you attach a saved persona via `persona_ids` (a partial `agent_details` still requires `name` and will 422).
 - **`analysis_options`** - the evaluation metric groups (see Metrics).
 - **`persona_ids`**, **`tags`**, **`draft`**, **`allow_hints`** as needed.
 
@@ -137,7 +137,7 @@ create_persona(
 )
 ```
 
-`temperament.talkativeness` and `pushback` are 0-10; `mood` is one of neutral, upbeat, irritated, distracted, rushed. `list_personas()` returns `{items}`; `get_persona(...)` fetches one. When a persona is attached, omit its identity from `agent_details` and write the session script about behavior only (see Create flow step 1).
+`temperament.talkativeness` and `pushback` are 0-10; `mood` is one of neutral, upbeat, irritated, distracted, rushed. `list_personas()` returns `{items}`; `get_persona(...)` fetches one. When a persona is attached, omit `agent_details` entirely (do not pass a partial dict - it would 422 on the required `name`) and write the session script about behavior only (see Create flow step 1).
 
 ### Voice options (match gender to persona)
 
