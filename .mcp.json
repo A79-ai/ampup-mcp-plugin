@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "ampup": {
+      "type": "http",
+      "url": "https://app.ampup.ai/mcp"
+    }
+  }
+}

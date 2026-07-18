@@ -1,0 +1,16 @@
+{
+  "name": "ampup-mcp-plugin",
+  "description": "AmpUp authoring skills — roleplay practice scripts and narrated courses, with the AmpUp MCP connector bundled.",
+  "owner": {
+    "name": "AmpUp",
+    "url": "https://ampup.ai"
+  },
+  "plugins": [
+    {
+      "name": "ampup-mcp-plugin",
+      "source": ".",
+      "description": "Author AmpUp roleplays and courses through the AmpUp MCP connector.",
+      "category": "sales-enablement"
+    }
+  ]
+}

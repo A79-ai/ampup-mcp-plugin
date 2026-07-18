@@ -1,0 +1,21 @@
+{
+  "name": "ampup-mcp-plugin",
+  "displayName": "AmpUp MCP Plugin",
+  "version": "0.1.0",
+  "description": "Author AmpUp roleplay practice scripts and narrated courses through the AmpUp MCP connector. All skills persist via MCP tools — no direct API access.",
+  "author": {
+    "name": "AmpUp",
+    "url": "https://ampup.ai"
+  },
+  "homepage": "https://github.com/A79-ai/ampup-mcp-plugin",
+  "repository": "https://github.com/A79-ai/ampup-mcp-plugin",
+  "license": "MIT",
+  "keywords": [
+    "ampup",
+    "roleplay",
+    "practice-script",
+    "course",
+    "sales-enablement",
+    "mcp"
+  ]
+}
